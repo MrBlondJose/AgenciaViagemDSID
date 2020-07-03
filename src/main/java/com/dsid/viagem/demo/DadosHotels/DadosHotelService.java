@@ -1,10 +1,11 @@
 package com.dsid.viagem.demo.DadosHotels;
 
-import com.dsid.viagem.demo.DadosHotels.Models.HotelModel;
-import com.dsid.viagem.demo.restAPICall.RapidAPICallService;
+import com.dsid.viagem.demo.DadosHotels.Models.Hotel;
+import com.dsid.viagem.demo.DadosHotels.Models.HotelResponse;
 import com.dsid.viagem.demo.restAPICall.TripAdvisorCallService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.mashape.unirest.http.exceptions.UnirestException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,18 +20,18 @@ public class DadosHotelService {
     @Autowired
     private TripAdvisorCallService tripAdvisorCallService;
 
-    private final String endpointUrl = "https://tripadvisor1.p.rapidapi.com/hotels/get-details";
+    private final String endpointUrl = "https://tripadvisor1.p.rapidapi.com/hotels/list";
 
 
 
-    public Map<String,Object> getExternalHotelData(Map<String, String> parameters) {
+    public List<Hotel> getExternalHotelData(Map<String, String> parameters) {
        try{
-           Map<String,Object> response= (Map<String,Object>)tripAdvisorCallService.getMethod(new HashMap<String, String>(),endpointUrl,parameters,Map.class);
+           Map<String,Object> response= (Map<String,Object>)tripAdvisorCallService.getMethod(new HashMap<String, String>(),endpointUrl,parameters, Map.class);
            this.filtrarResponse(response);
-           return response;
+           return this.convertToHotelList(response);
        }
        catch (Exception e){
-           return new HashMap<String, Object>();
+           return new ArrayList<>();
        }
     }
 
@@ -38,8 +39,22 @@ public class DadosHotelService {
      * Retorna infos de quartos de hoteis persistidos no Banco de dados
      * @return
      */
-    public HotelModel getHotelinDB(String hotelId){
+    public Object getHotelinDB(String hotelId){
         return null;
+    }
+
+    private List<Hotel> convertToHotelList(Map<String,Object> response) throws JsonProcessingException {
+        Map<String,Object> filteredResponse= new HashMap<String, Object>();
+        List<Map> data= (List<Map>)response.get("data");
+        List<Hotel> dataResult=new ArrayList<>();
+        ObjectMapper mapper=new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
+        for(Map o:data){
+            String json= mapper.writeValueAsString(o);
+            Hotel hotel= mapper.readValue(json,Hotel.class);
+            dataResult.add(hotel);
+        }
+        return dataResult;
     }
 
     private Map<String,Object> filtrarResponse(Map<String,Object> response){

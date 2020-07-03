@@ -1,6 +1,7 @@
 package com.dsid.viagem.demo.restAPICall;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -23,6 +24,7 @@ public class RestAPICallService {
         HttpResponse<String> response =Unirest.get(this.buildUrlRequest(endpointPath,urlParameters))
                 .headers(headers)
                 .asString();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false);
         return mapper.readValue(response.getBody(),responseClass);
     }
 

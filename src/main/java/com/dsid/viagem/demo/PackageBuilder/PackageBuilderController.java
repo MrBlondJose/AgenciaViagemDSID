@@ -1,6 +1,6 @@
 package com.dsid.viagem.demo.PackageBuilder;
 
-import com.dsid.viagem.demo.DadosLocalizacoes.DadosLocalizacoesAeroportosSerivce;
+import com.dsid.viagem.demo.PackageBuilder.service.PackageBuilderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -20,7 +20,18 @@ public class PackageBuilderController {
     @GetMapping(path="/teste3",consumes = "application/json", produces = "application/json")
     public String testeCaller2() throws JsonProcessingException, UnirestException {
         String query="Guarulhos";
-        packageBuilderService.getPackages(query,"10");
-       return null;
+        String destino= "Goiania";
+        Map<String,String> parameters=new HashMap<>();
+        parameters.put("checkin","2020-07-30");
+        parameters.put("adults","1");
+        parameters.put("nights","1");
+        parameters.put("sort","recommended");
+        parameters.put("rooms","1");
+        parameters.put("offset","0");
+        parameters.put("order","asc");
+        parameters.put("limit","30");
+        ObjectMapper mapper=new ObjectMapper();
+        String json =mapper.writeValueAsString(packageBuilderService.getPackages(query,destino,"10",parameters));
+        return json;
     }
 }
