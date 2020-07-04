@@ -43,7 +43,7 @@ public class DadosClienteController {
                 if (this.clienteService.cadastraCliente(clienteHttp)) {
                     return new ResponseEntity<String>("Cliente cadastrado com sucesso", HttpStatus.CREATED);
                 } else {
-                    return new ResponseEntity<String>("Cadastro invalido. Cliente já cadastrado", HttpStatus.BAD_REQUEST;
+                    return new ResponseEntity<String>("Cadastro invalido. Cliente já cadastrado", HttpStatus.BAD_REQUEST);
                 }
             }
             catch (CampoInvalidoException e){
@@ -56,10 +56,10 @@ public class DadosClienteController {
     public ResponseEntity<HttpResponse> getDadosCliente(@RequestBody ClienteHttp request){
         ClienteHttp response= clienteService.loginCliente(request);
         if(response==null){
-            return new ResponseEntity<HttpResponse>(new HttpResponse("Email ou senha invalidos",null),HttpStatus.OK);
+            return new ResponseEntity<HttpResponse>(new HttpResponse("true","Email ou senha invalidos",null),HttpStatus.OK);
         }
 
-        return new ResponseEntity<HttpResponse>(new HttpResponse("Login efetuado com sucesso",response),HttpStatus.OK);
+        return new ResponseEntity<HttpResponse>(new HttpResponse("false","Login efetuado com sucesso",response),HttpStatus.OK);
     }
 
     @GetMapping(path="/teste",consumes = "application/json", produces = "application/json")
