@@ -16,10 +16,11 @@ public class DadosLocalizacoesService {
     @Autowired
     private TripAdvisorCallService tripAdvisorCallService;
 
-    private final String endpointUrl = "https://tripadvisor1.p.rapidapi.com/locations/auto-complete";
+    private final String endpointUrl = "https://tripadvisor1.p.rapidapi.com/locations/search";
 
     public Map<String,Object> getLocationsData(Map<String, String> parameters) {
         Map<String,String> headers=new HashMap<>();
+        parameters.put("sort","relevance");
         headers.put("x-rapidapi-host","tripadvisor1.p.rapidapi.com");
         try{
             Map<String,Object> response= (Map<String,Object>)tripAdvisorCallService.getMethod(headers,endpointUrl,parameters,Map.class);
@@ -41,9 +42,17 @@ public class DadosLocalizacoesService {
     private void filtrarResponse(Map<String,Object> response){
         List<Map> data= (List<Map>)response.get("data");
         List<Map> dataResult=new ArrayList<>();
+        /*
         for(Map o:data){
             String resultType= (String)o.get("result_type");
             if(resultType!=null && resultType.toLowerCase().equals("geos")){
+                dataResult.add(o);
+                break;
+            }
+        }*/
+        for(Map o:data){
+            String resultType= (String)o.get("result_type");
+            if(resultType!=null){
                 dataResult.add(o);
                 break;
             }

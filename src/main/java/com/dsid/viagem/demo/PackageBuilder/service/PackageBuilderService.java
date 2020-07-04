@@ -34,7 +34,7 @@ public class PackageBuilderService {
     DadosVoosService dadosVoosService;
 
 
-    public List<Package> getPackages(String origin, String destiny , String radius,Map<String,String> headersHotel ) throws JsonProcessingException {
+    public List<Package> getPackages(String origin, String destiny , String radius,Map<String,String> headersHotel ) throws Exception {
         List<Airport> airportsOrigin=this.getNearAirportFromLocation(origin,radius,new Image());
         Image imagemDestino=new Image();
         List<Airport> airportsDestiny=this.getNearAirportFromLocation(destiny,radius,imagemDestino);
@@ -42,14 +42,21 @@ public class PackageBuilderService {
 
     }
 
-    private List<Package> getHotelsDataByDestinyAirport(Airport origin,List<Airport> aiportsDestiny, Map<String,String> headersHotel,Image image) throws JsonProcessingException {
+    private List<Package> getHotelsDataByDestinyAirport(Airport origin,List<Airport> aiportsDestiny, Map<String,String> headersHotel,Image image) throws Exception {
         headersHotel.put("location_id",aiportsDestiny.get(0).getLocationId());
         List<Package> packageList=new ArrayList<>();
+        boolean voosEncontrados=false;
+        boolean hoteisEncontrados=false;
         for(Airport airport: aiportsDestiny){
             headersHotel.put("location_id",airport.getLocationId());
             List<Voo> voosList=this.getFlightData(origin.getIataCode(),airport.getIataCode(),headersHotel.get("checkin"));
-            if(voosList.size()==0) continue;
+            if(voosList.size()==0) {
+               continue;
+            };
+            voosEncontrados=true;
             List<Hotel> hotelList=dadosHotelService.getExternalHotelData(headersHotel);
+            if(hotelList.size()==0)continue;
+            hoteisEncontrados=true;
             for(Hotel hotel:hotelList){
                 List<Offer> offerList= hotel.getHacOffers().getOffers();
                 int i=0;
@@ -66,6 +73,8 @@ public class PackageBuilderService {
                 }
             }
         }
+        if(!voosEncontrados) throw new Exception("Voos nao encontrados");
+        if(!hoteisEncontrados) throw new Exception("Hoteis nao encontrados");
         return packageList;
     }
 
@@ -96,9 +105,9 @@ public class PackageBuilderService {
         List<Map> data= (List<Map>) locationsResponse.get("data");
         Map<String,Object> resultObject=(Map<String, Object>) (data.get(0).get("result_object"));
         Map<String,Object> photo= (Map<String, Object>) resultObject.get("photo");
-        if(photo==null) return null;
+        if(photo==null) return new Image();
         Map<String,Object> images= (Map<String, Object>) photo.get("images");
-        if(images==null) return null;
+        if(images==null) return new Image();
         return new Image((Map<String, String>) images.get("large"));
     }
 

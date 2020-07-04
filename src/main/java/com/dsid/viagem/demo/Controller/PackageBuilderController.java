@@ -28,7 +28,7 @@ public class PackageBuilderController {
             @RequestParam(required = true) String nights,
             @RequestParam(required = false) String hotel_class,
             @RequestParam(required = false) String pricesmax
-    ) throws JsonProcessingException, UnirestException {
+    ) throws Exception {
 
         Map<String,String> parametSers=new HashMap<>();
         parametSers.put("checkin",checkin);
@@ -42,7 +42,15 @@ public class PackageBuilderController {
         parametSers.put("hotel_class",hotel_class);
         parametSers.put("pricesmax",pricesmax);
         ObjectMapper mapper=new ObjectMapper();
-        String json =mapper.writeValueAsString(packageBuilderService.getPackages(origin,destiny,"20",parametSers));
+        String json="{}";
+        for(int i=0;i<3;i++) {
+            try {
+              json  = mapper.writeValueAsString(packageBuilderService.getPackages(origin, destiny, "20", parametSers));
+              break;
+            } catch (Exception e) {
+                continue;
+            }
+        }
         return json;
     }
 }
