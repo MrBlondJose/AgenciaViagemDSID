@@ -3,6 +3,7 @@ package com.dsid.viagem.demo.PackageBuilder.service;
 import com.dsid.viagem.demo.DadosHotels.DadosHotelService;
 import com.dsid.viagem.demo.DadosHotels.Models.HacOffers;
 import com.dsid.viagem.demo.DadosHotels.Models.Hotel;
+import com.dsid.viagem.demo.DadosHotels.Models.Image;
 import com.dsid.viagem.demo.DadosHotels.Models.Offer;
 import com.dsid.viagem.demo.DadosLocalizacoes.DadosLocalizacoesAeroportosSerivce;
 import com.dsid.viagem.demo.DadosLocalizacoes.DadosLocalizacoesService;
@@ -34,13 +35,14 @@ public class PackageBuilderService {
 
 
     public List<Package> getPackages(String origin, String destiny , String radius,Map<String,String> headersHotel ) throws JsonProcessingException {
-        List<Airport> airportsOrigin=this.getNearAirportFromLocation(origin,radius);
-        List<Airport> airportsDestiny=this.getNearAirportFromLocation(destiny,radius);
-        return this.getHotelsDataByDestinyAirport(airportsOrigin.get(0),airportsDestiny,headersHotel);
+        List<Airport> airportsOrigin=this.getNearAirportFromLocation(origin,radius,new Image());
+        Image imagemDestino=new Image();
+        List<Airport> airportsDestiny=this.getNearAirportFromLocation(destiny,radius,imagemDestino);
+        return this.getHotelsDataByDestinyAirport(airportsOrigin.get(0),airportsDestiny,headersHotel,imagemDestino);
 
     }
 
-    private List<Package> getHotelsDataByDestinyAirport(Airport origin,List<Airport> aiportsDestiny, Map<String,String> headersHotel) throws JsonProcessingException {
+    private List<Package> getHotelsDataByDestinyAirport(Airport origin,List<Airport> aiportsDestiny, Map<String,String> headersHotel,Image image) throws JsonProcessingException {
         headersHotel.put("location_id",aiportsDestiny.get(0).getLocationId());
         List<Package> packageList=new ArrayList<>();
         for(Airport airport: aiportsDestiny){
@@ -60,7 +62,7 @@ public class PackageBuilderService {
                     HacOffers hacOffers=new HacOffers();
                     hacOffers.setOffers(offers);
                     hotelPackage.setHacOffers(hacOffers);
-                    packageList.add(new Package(airport,origin,hotelPackage,voosList.get(0)));
+                    packageList.add(new Package(airport,origin,hotelPackage,voosList.get(0),image));
                     i++;
                 }
             }
@@ -76,11 +78,12 @@ public class PackageBuilderService {
         return this.dadosVoosService.getExternalFlighData(headers);
     }
 
-    public  List<Airport> getNearAirportFromLocation(String locationQuery, String radius){
+    public  List<Airport> getNearAirportFromLocation(String locationQuery, String radius, Image image){
 
         Map<String,Object> dadosLocation=this.getLocationData(locationQuery);
         String latitude= this.getLatitude(dadosLocation);
         String longitude=this.getLongitude(dadosLocation);
+        image.alteraImagem(this.getImage(dadosLocation));
         Map<String,Object> aeroportosProximos= this.dadosLocalizacoesAeroportosSerivce.getNearAirportsData(latitude,longitude,radius,"5");
         int size= ((List<Map>)(aeroportosProximos.get("items"))).size();
         List<Airport> airports=new ArrayList<>();
@@ -88,6 +91,16 @@ public class PackageBuilderService {
             airports.add(new Airport(aeroportosProximos,i,this.getLocationId(dadosLocation)));
         }
         return airports;
+    }
+
+    private Image getImage(Map<String,Object> locationsResponse){
+        List<Map> data= (List<Map>) locationsResponse.get("data");
+        Map<String,Object> resultObject=(Map<String, Object>) (data.get(0).get("result_object"));
+        Map<String,Object> photo= (Map<String, Object>) resultObject.get("photo");
+        if(photo==null) return null;
+        Map<String,Object> images= (Map<String, Object>) photo.get("images");
+        if(images==null) return null;
+        return new Image((Map<String, String>) images.get("large"));
     }
 
     private String getLocationId(Map<String,Object> locationsResponse){

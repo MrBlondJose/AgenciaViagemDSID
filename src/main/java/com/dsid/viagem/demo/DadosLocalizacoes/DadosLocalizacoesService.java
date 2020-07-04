@@ -31,6 +31,13 @@ public class DadosLocalizacoesService {
         }
     }
 
+    public String getLocationId(Map<String,String> parameters){
+        Map<String,Object> locationsResponse= this.getLocationsData(parameters);
+        List<Map> data= (List<Map>) locationsResponse.get("data");
+        Map<String,Object> resultObject=(Map<String, Object>) (data.get(0).get("result_object"));
+        return (String)resultObject.get("location_id");
+    }
+
     private void filtrarResponse(Map<String,Object> response){
         List<Map> data= (List<Map>)response.get("data");
         List<Map> dataResult=new ArrayList<>();

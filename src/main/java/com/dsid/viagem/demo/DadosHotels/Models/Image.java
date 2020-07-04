@@ -22,4 +22,10 @@ public class Image {
             this.height = map.get(height);
         }
     }
+
+    public void alteraImagem(Image img){
+        this.height=img.height;
+        this.url=img.url;
+        this.width=img.width;
+    }
 }
