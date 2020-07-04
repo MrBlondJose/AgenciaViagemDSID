@@ -1,5 +1,6 @@
 package com.dsid.viagem.demo.Controller;
 
+import com.dsid.viagem.demo.DadosCliente.Models.Entities.Cliente;
 import com.dsid.viagem.demo.DadosCliente.Models.HttpModels.HttpResponse;
 import com.dsid.viagem.demo.DadosCliente.exceptions.CampoInvalidoException;
 import com.dsid.viagem.demo.DadosCliente.Models.HttpModels.ClienteHttp;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,16 +40,18 @@ public class DadosClienteController {
 
 
     @PostMapping(path= "/cadastro", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<String> cadastraCliente(@RequestBody ClienteHttp clienteHttp) throws CampoInvalidoException {
+    public ResponseEntity<HttpResponse> cadastraCliente(@RequestBody ClienteHttp clienteHttp) throws CampoInvalidoException {
             try{
-                if (this.clienteService.cadastraCliente(clienteHttp)) {
-                    return new ResponseEntity<String>("Cliente cadastrado com sucesso", HttpStatus.CREATED);
+                Cliente cliente = clienteService.cadastraCliente(clienteHttp);
+                if (cliente!=null) {
+                    ClienteHttp clienteHttp1 = new ClienteHttp(cliente);
+                    return new ResponseEntity<HttpResponse>(new HttpResponse("true",clienteHttp1,"Cadastro realizado com sucesso",clienteHttp.getCpf()),HttpStatus.OK);
                 } else {
-                    return new ResponseEntity<String>("Cadastro invalido. Cliente já cadastrado", HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity<HttpResponse>(new HttpResponse("false",null,"Cliente já cadastrado",""),HttpStatus.BAD_REQUEST);
                 }
             }
             catch (CampoInvalidoException e){
-                return new ResponseEntity<String>(e.getMessage(),HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<HttpResponse>(new HttpResponse("false",null,"Erro Interno",""),HttpStatus.INTERNAL_SERVER_ERROR);
             }
 
     }

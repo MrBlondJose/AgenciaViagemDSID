@@ -10,7 +10,7 @@ public class ClienteService extends AbstractService{
 
 
 
-    public boolean cadastraCliente(ClienteHttp clienteHttp) throws CampoInvalidoException {
+    public Cliente cadastraCliente(ClienteHttp clienteHttp) throws CampoInvalidoException {
         Cliente cliente= new Cliente.Builder(clienteHttp.getEmail()).
                 nome(clienteHttp.getNome()).
                 nomeMae(clienteHttp.getNomeMae()).
@@ -21,7 +21,8 @@ public class ClienteService extends AbstractService{
                 cartoesCliente(clienteHttp.getCartoesCliente()).
                 enderecosCliente(clienteHttp.getEnderecosCliente()).
                 build();
-        return repository.insertData(cliente);
+        if(repository.insertData(cliente)) return cliente;
+        return null;
     }
 
     public ClienteHttp loginCliente(ClienteHttp request){
