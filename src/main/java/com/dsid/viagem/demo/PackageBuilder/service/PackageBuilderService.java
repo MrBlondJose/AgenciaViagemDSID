@@ -48,10 +48,9 @@ public class PackageBuilderService {
         for(Airport airport: aiportsDestiny){
             headersHotel.put("location_id",airport.getLocationId());
             List<Voo> voosList=this.getFlightData(origin.getIataCode(),airport.getIataCode(),headersHotel.get("checkin"));
-            if(voosList.size()==0) break;
+            if(voosList.size()==0) continue;
             List<Hotel> hotelList=dadosHotelService.getExternalHotelData(headersHotel);
             for(Hotel hotel:hotelList){
-
                 List<Offer> offerList= hotel.getHacOffers().getOffers();
                 int i=0;
                 for(Offer offer:offerList){
