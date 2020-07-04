@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -17,21 +18,31 @@ public class PackageBuilderController {
     @Autowired
    private PackageBuilderService packageBuilderService;
 
-    @GetMapping(path="/teste3",consumes = "application/json", produces = "application/json")
-    public String testeCaller2() throws JsonProcessingException, UnirestException {
-        String query="Guarulhos";
-        String destino= "Goiania";
+    @GetMapping(path="/pacotes", produces = "application/json")
+    public String getPackages(
+            @RequestParam(required = true) String origin,
+            @RequestParam(required = true) String destiny,
+            @RequestParam(required = true) String checkin,
+            @RequestParam(required = true) String adults,
+            @RequestParam(required = true) String rooms,
+            @RequestParam(required = true) String nights,
+            @RequestParam(required = false) String hotel_class,
+            @RequestParam(required = false) String pricesmax
+    ) throws JsonProcessingException, UnirestException {
+
         Map<String,String> parametSers=new HashMap<>();
-        parametSers.put("checkin","2020-07-30");
-        parametSers.put("adults","1");
-        parametSers.put("nights","1");
+        parametSers.put("checkin",checkin);
+        parametSers.put("adults",adults);
+        parametSers.put("nights",nights);
         parametSers.put("sort","recommended");
-        parametSers.put("rooms","1");
+        parametSers.put("rooms",rooms);
         parametSers.put("offset","0");
         parametSers.put("order","asc");
         parametSers.put("limit","30");
+        parametSers.put("hotel_class",hotel_class);
+        parametSers.put("pricesmax",pricesmax);
         ObjectMapper mapper=new ObjectMapper();
-        String json =mapper.writeValueAsString(packageBuilderService.getPackages(query,destino,"10",parametSers));
+        String json =mapper.writeValueAsString(packageBuilderService.getPackages(origin,destiny,"20",parametSers));
         return json;
     }
 }
