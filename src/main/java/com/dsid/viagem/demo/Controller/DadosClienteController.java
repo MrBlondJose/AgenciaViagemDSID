@@ -54,7 +54,7 @@ public class DadosClienteController {
 
     }
 
-    @GetMapping(path="/login",consumes = "application/json", produces = "application/json")
+    @PostMapping(path="/login",consumes = "application/json", produces = "application/json")
     public ResponseEntity<HttpResponse> getDadosCliente(@RequestBody ClienteHttp request){
         ClienteHttp response= clienteService.loginCliente(request);
         if(response==null){
