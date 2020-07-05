@@ -20,6 +20,8 @@ public class PackageBuilderController {
     @Autowired
    private PackageBuilderService packageBuilderService;
 
+   private static List<Package> packagesHome;
+
     @GetMapping(path="/pacotes", produces = "application/json")
     public List<Package> getPackages(
             @RequestParam(required = true) String origin,
@@ -59,6 +61,7 @@ public class PackageBuilderController {
 
     @GetMapping(path="/pacotesHome", produces = "application/json")
     public List<Package> getPacotesHome() throws Exception {
+        if(PackageBuilderController.packagesHome!=null) return PackageBuilderController.packagesHome;
         String orgin="Guarulhos";
         String destiny1="Maceio";
         String destiny2="Florianopolis";
@@ -85,6 +88,7 @@ public class PackageBuilderController {
             this.addPackagesToList(pacotes3,responseList,5);
         }
         catch (Exception e){ }
+        PackageBuilderController.packagesHome=responseList;
         return responseList;
     }
 
