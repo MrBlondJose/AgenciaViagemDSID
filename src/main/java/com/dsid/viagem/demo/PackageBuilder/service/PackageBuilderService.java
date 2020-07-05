@@ -88,13 +88,20 @@ public class PackageBuilderService {
 
     public  List<Airport> getNearAirportFromLocation(String locationQuery, String radius, Image image){
 
+
         Map<String,Object> dadosLocation=this.getLocationData(locationQuery);
         String latitude= this.getLatitude(dadosLocation);
         String longitude=this.getLongitude(dadosLocation);
         image.alteraImagem(this.getImage(dadosLocation));
+        List<Airport> airports=new ArrayList<>();
+        String locationArrumada=locationQuery.trim().toLowerCase().replaceAll("_","").replaceAll("ã","a").replaceAll(" ","");
+        if(locationArrumada.equals("saopaulo") || locationArrumada.equals("guarulhos")){
+            airports.add( Airport.createGuarulhos());
+            return airports;
+        }
         Map<String,Object> aeroportosProximos= this.dadosLocalizacoesAeroportosSerivce.getNearAirportsData(latitude,longitude,radius,"5");
         int size= ((List<Map>)(aeroportosProximos.get("items"))).size();
-        List<Airport> airports=new ArrayList<>();
+
         for(int i=0;i<size && i<5;i++){
             airports.add(new Airport(aeroportosProximos,i,this.getLocationId(dadosLocation)));
         }

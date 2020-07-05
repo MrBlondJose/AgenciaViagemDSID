@@ -111,4 +111,18 @@ public class Airport {
         this.countryCode=(String)itemsMap.get("countryCode");
         this.locationId=locationId;
     }
+
+    public static Airport createGuarulhos() {
+        Airport airport=new Airport();
+        airport.setIcaoCode("SBGR");
+        airport.setIataCode("GRU");
+        airport.setName("São Paulo, Guarulhos - Governador André Franco Montoro");
+        airport.setCityName("São Paulo");
+        airport.setLatitude(-23.4355564);
+        airport.setLongitude(-46.4730568);
+        airport.setCountryCode("BR");
+        airport.setLocationId("303611");
+        return airport;
+
+    }
 }

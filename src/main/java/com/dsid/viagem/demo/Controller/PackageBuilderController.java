@@ -50,9 +50,11 @@ public class PackageBuilderController {
         ObjectMapper mapper=new ObjectMapper();
         String json="{}";
         List<Package> response=new ArrayList<>();
+        int radius=20;
         for(int i=0;i<3;i++) {
             try {
-              response= (packageBuilderService.getPackages(origin, destiny, "20", parametSers));
+              response= (packageBuilderService.getPackages(origin, destiny, Integer.toString(radius), parametSers));
+              radius+=15;
               break;
             } catch (Exception e) {
                 continue;
