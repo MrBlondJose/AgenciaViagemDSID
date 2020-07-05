@@ -1,5 +1,6 @@
 package com.dsid.viagem.demo.Controller;
 
+import com.dsid.viagem.demo.PackageBuilder.models.Package;
 import com.dsid.viagem.demo.PackageBuilder.service.PackageBuilderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,8 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController
 public class PackageBuilderController {
@@ -19,7 +21,7 @@ public class PackageBuilderController {
    private PackageBuilderService packageBuilderService;
 
     @GetMapping(path="/pacotes", produces = "application/json")
-    public String getPackages(
+    public List<Package> getPackages(
             @RequestParam(required = true) String origin,
             @RequestParam(required = true) String destiny,
             @RequestParam(required = true) String checkin,
@@ -43,14 +45,55 @@ public class PackageBuilderController {
         parametSers.put("pricesmax",pricesmax);
         ObjectMapper mapper=new ObjectMapper();
         String json="{}";
+        List<Package> response=new ArrayList<>();
         for(int i=0;i<3;i++) {
             try {
-              json  = mapper.writeValueAsString(packageBuilderService.getPackages(origin, destiny, "20", parametSers));
+              response= (packageBuilderService.getPackages(origin, destiny, "20", parametSers));
               break;
             } catch (Exception e) {
                 continue;
             }
         }
-        return json;
+       return response;
+    }
+
+    @GetMapping(path="/pacotesHome", produces = "application/json")
+    public List<Package> getPacotesHome() throws Exception {
+        String orgin="Guarulhos";
+        String destiny1="Maceio";
+        String destiny2="Florianopolis";
+        String destiny3="NovaYork";
+        String adults="1";
+        String nights="2";
+        String rooms="1";
+        SimpleDateFormat simpleDateFormatComHora = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat dateFormat= DateFormat.getDateInstance();
+
+
+        Date date= new Date();
+        date.setDate(date.getDate()+4);
+
+        String checkin=simpleDateFormatComHora.format(date);
+
+        List<Package> responseList=new ArrayList<>();
+        try {
+            List<Package> pacotes1 = this.getPackages(orgin, destiny1, checkin, adults, rooms, nights, "", "");
+            this.addPackagesToList(pacotes1,responseList,5);
+            List<Package> pacotes2 = this.getPackages(orgin, destiny2, checkin, adults, rooms, nights, "", "");
+            this.addPackagesToList(pacotes2,responseList,5);
+            List<Package> pacotes3 = this.getPackages(orgin, destiny3, checkin, adults, rooms, nights, "", "");
+            this.addPackagesToList(pacotes3,responseList,5);
+        }
+        catch (Exception e){ }
+        return responseList;
+    }
+
+    private void addPackagesToList(List<Package> list, List<Package> response,int limit){
+        int i=0;
+        for(Package p: list){
+            if(i>limit) break;
+            response.add(p);
+            i++;
+        }
     }
 }
