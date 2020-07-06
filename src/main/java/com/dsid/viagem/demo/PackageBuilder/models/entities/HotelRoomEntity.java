@@ -20,7 +20,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class HotelRoomEntity {
 
-
     @Id
     @GeneratedValue(generator="system-uuid")
     @GenericGenerator(name="system-uuid", strategy = "uuid")
